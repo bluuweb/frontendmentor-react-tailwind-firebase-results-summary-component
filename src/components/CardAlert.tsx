@@ -1,14 +1,8 @@
-interface Summary {
-  icon: React.FC;
-  title: string;
-  value: string | number;
-  total: string | number;
-  bgColor?: string;
-  titleColor?: string;
-}
+import { Summary } from "../types/interfaces";
 
 export default function CardAlert({
-  icon: Icon,
+  id,
+  icon,
   title,
   value,
   total,
@@ -16,8 +10,10 @@ export default function CardAlert({
   titleColor = "text-orange-900",
 }: Summary) {
   return (
-    <article className={`flex gap-2 rounded-lg ${bgColor} p-4 font-semibold`}>
-      {<Icon />}
+    <article
+      className={`flex items-center gap-2 rounded-lg ${bgColor} p-4 font-semibold`}
+    >
+      <i className={icon}></i>
 
       <span className={`flex-1 ${titleColor}`}>{title}</span>
       <div>

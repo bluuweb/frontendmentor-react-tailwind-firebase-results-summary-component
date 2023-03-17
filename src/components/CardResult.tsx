@@ -1,4 +1,4 @@
-export default function CardLeft(): JSX.Element {
+export default function CardResult(): JSX.Element {
   return (
     <section className="rounded-b-3xl bg-gradient-to-b from-violet-600 to-blue-600 p-8 text-center">
       <h3 className="pb-4 text-gray-300">Your result</h3>
