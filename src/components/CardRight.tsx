@@ -43,7 +43,7 @@ const Summarys = [
 export default function CardRight() {
   return (
     <section className="p-8">
-      <h2 className="mb-8">Summary</h2>
+      <h2 className="mb-8 text-lg font-medium">Summary</h2>
       <div className="grid gap-2">
         {Summarys.map(
           ({ icon, title, value, total, bgColor, titleColor }, index) => (
