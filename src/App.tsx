@@ -35,7 +35,8 @@ export default function App() {
             id: change.doc.id,
             ...change.doc.data(),
           } as Summary;
-          setSummarys([...summarys, summary]);
+
+          setSummarys((prev) => [...prev, summary]);
         }
         if (change.type === "modified") {
           console.log("Modified summary: ", change.doc.data());
