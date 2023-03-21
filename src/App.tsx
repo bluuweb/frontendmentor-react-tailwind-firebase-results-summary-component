@@ -10,6 +10,13 @@ export default function App() {
   const [user, setUser] = useState<unknown>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [summarys, setSummarys] = useState<Summary[]>([]);
+  const [disabled, setDisabled] = useState<boolean>(false);
+
+  if(disabled){
+    setTimeout(() => {
+      setDisabled(false);
+    }, 1000 * 60);
+  }
 
   useEffect(() => {
     checkAuthState()
@@ -30,19 +37,28 @@ export default function App() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
-          console.log("New summary: ", change.doc.data(), change.doc.id);
+          const summary = {
+            id: change.doc.id,
+            ...change.doc.data(),
+          } as Summary;
+          
+          setSummarys(prev => [...prev, summary]);
+        }
+        if (change.type === "modified") {
+          const summary = {
+            id: change.doc.id,
+            ...change.doc.data(),
+          } as Summary;
+          
+          setSummarys(prev => prev.map(s => s.id === summary.id ? summary : s));
+        }
+        if (change.type === "removed") {
           const summary = {
             id: change.doc.id,
             ...change.doc.data(),
           } as Summary;
 
-          setSummarys((prev) => [...prev, summary]);
-        }
-        if (change.type === "modified") {
-          console.log("Modified summary: ", change.doc.data());
-        }
-        if (change.type === "removed") {
-          console.log("Removed summary: ", change.doc.data());
+          setSummarys(prev => prev.filter(s => s.id !== summary.id));
         }
       });
     });
@@ -63,7 +79,7 @@ export default function App() {
         <article className="grid max-w-4xl overflow-hidden bg-white shadow-md sm:grid-cols-2 sm:rounded-3xl">
           <CardResult />
 
-          <CardSummary summarys={summarys} />
+          <CardSummary summarys={summarys} disabled={disabled} setDisabled={setDisabled}/>
         </article>
       </div>
     </main>

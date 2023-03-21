@@ -6,7 +6,7 @@ import {
   signInAnonymously,
 } from "firebase/auth";
 
-import { Firestore, getFirestore } from "firebase/firestore";
+import { doc, Firestore, getFirestore, setDoc, serverTimestamp, getDoc  } from "firebase/firestore";
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: import.meta.env.VITE_apiKey,
@@ -18,7 +18,7 @@ const firebaseConfig: FirebaseOptions = {
 };
 
 const app: FirebaseApp = initializeApp(firebaseConfig);
-const auth: Auth = getAuth(app);
+export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);
 
 export const checkAuthState = () =>
@@ -28,6 +28,15 @@ export const checkAuthState = () =>
       async (user) => {
         unsubscribe();
         if (user) {
+          const lastVoteRef = doc(db, "lastVotes", user.uid);
+          
+          const docSnap = await getDoc(lastVoteRef);
+        
+          if(!docSnap.exists()){
+            await setDoc(lastVoteRef, {
+              lastVoteServerTime: serverTimestamp(),
+            });
+          }
           resolve(user);
         } else {
           try {
@@ -44,7 +53,7 @@ export const checkAuthState = () =>
 const loginAnonymously = async (): Promise<unknown> => {
   try {
     const res = await signInAnonymously(auth);
-    console.log(res);
+    // console.log(res);
     return res;
   } catch (error) {
     console.log(error);

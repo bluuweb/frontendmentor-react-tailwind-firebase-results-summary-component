@@ -1,41 +1,6 @@
 import { Summary } from "../types/interfaces";
 import CardAlert from "./CardAlert";
 
-// const Summarys = [
-//   {
-//     icon: "fa-brands fa-angular",
-//     title: "Angular",
-//     value: 80,
-//     total: "100",
-//     bgColor: "bg-red-100",
-//     titleColor: "text-red-900",
-//   },
-//   {
-//     icon: "fa-brands fa-react",
-//     title: "Javascript",
-//     value: 92,
-//     total: "100",
-//     bgColor: "bg-yellow-100",
-//     titleColor: "text-yellow-900",
-//   },
-//   {
-//     icon: "fa-brands fa-react",
-//     title: "Nuxt 3",
-//     value: 61,
-//     total: "100",
-//     bgColor: "bg-green-100",
-//     titleColor: "text-green-900",
-//   },
-//   {
-//     icon: "fa-brands fa-react",
-//     title: "Next 13",
-//     value: 72,
-//     total: "100",
-//     bgColor: "bg-blue-100",
-//     titleColor: "text-blue-900",
-//   },
-// ] as Summary[];
-
 const sortSummary = (items: Array<Summary>) => {
   if (!items) return [];
   return items.sort((a, b) => {
@@ -45,7 +10,13 @@ const sortSummary = (items: Array<Summary>) => {
   });
 };
 
-export default function CardSummary({ summarys }: { summarys: Summary[] }) {
+interface Props {
+  summarys: Summary[];
+  disabled: boolean;
+  setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function CardSummary({ summarys, disabled, setDisabled }: Props) {
   return (
     <section className="p-8">
       <h2 className="mb-8 text-lg font-medium">Summary</h2>
@@ -61,6 +32,8 @@ export default function CardSummary({ summarys }: { summarys: Summary[] }) {
               total={total}
               bgColor={bgColor}
               titleColor={titleColor}
+              disabled={disabled}
+              setDisabled={setDisabled}
             />
           )
         )}
