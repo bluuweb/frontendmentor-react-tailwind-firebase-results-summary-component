@@ -1,12 +1,13 @@
 import { User } from "firebase/auth";
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
-import { useState } from "react";
+import { doc, getDoc, onSnapshot, serverTimestamp, setDoc, Timestamp, updateDoc } from "firebase/firestore";
+import { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { Summary } from "../types/interfaces";
 
 interface CardAlertProps extends Summary{
   disabled: boolean;
   setDisabled: (disabled: boolean) => void;
+  getTimeServer: () => void;
 }
 
 export default function CardAlert({
@@ -19,51 +20,33 @@ export default function CardAlert({
   titleColor = "text-orange-900",
   disabled,
   setDisabled,
+  getTimeServer
 }: CardAlertProps) {
+
 
   const handleIncrement = async() => {
     const summaryRef = doc(db, "summarys", id);
-
-    // currentUser
     const user: User | null = auth.currentUser;
 
     if(disabled){
       return;
     }
-    // Consulta la hora de la última votación del usuario desde la base de datos.
+
     if(user?.uid){
-
       setDisabled(true);
-
       const lastVoteRef = doc(db, "lastVotes", user.uid);
-      await setDoc(lastVoteRef, {
-        currentVoteServerTime: serverTimestamp(),
-      }, { merge: true });
-
-      const lastVoteDoc = await getDoc(lastVoteRef);
-      const lastVoteServerTime = lastVoteDoc.data()?.lastVoteServerTime;
-      const currentVoteServerTime = lastVoteDoc.data()?.currentVoteServerTime;
-
-      // Compara la hora de la última votación con la marca de tiempo del servidor para determinar si ha pasado al menos un minuto.
-      const canVote = !lastVoteServerTime || (currentVoteServerTime.toDate().getTime() - lastVoteServerTime.toDate().getTime()) >= (60 * 1000);
-
-      console.log((currentVoteServerTime.toDate().getTime() - lastVoteServerTime.toDate().getTime()))
-      // Si ha pasado al menos un minuto, permite la votación y actualiza la hora de la última votación en la base de datos.
-      if (canVote) {
-        await setDoc(lastVoteRef, {
-          lastVoteServerTime: serverTimestamp(),
-        }, { merge: true });
-
-        await updateDoc(summaryRef, {
-          value: value + 1,
-        });
-        console.log("Increment", id);
-        
-      } else {
-        console.log("No se puede votar en este momento");
-      }
-
       
+      await setDoc(lastVoteRef, {
+        voteTime: serverTimestamp()
+      });
+      await updateDoc(summaryRef, {
+        value: value + 1,
+      });
+
+      getTimeServer()
+      // setTimeout(() => {
+      //   setDisabled(false);
+      // }, 1000 * 60);
     }
 
   };

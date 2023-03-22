@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import { Summary } from "../types/interfaces";
 import CardAlert from "./CardAlert";
 
@@ -11,12 +12,13 @@ const sortSummary = (items: Array<Summary>) => {
 };
 
 interface Props {
-  summarys: Summary[];
   disabled: boolean;
-  setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  setDisabled: (disabled: boolean) => void;
+  summarys: Array<Summary>;
+  getTimeServer: () => void;
 }
 
-export default function CardSummary({ summarys, disabled, setDisabled }: Props) {
+export default function CardSummary({ summarys, disabled, setDisabled, getTimeServer }: Props) {
   return (
     <section className="p-8">
       <h2 className="mb-8 text-lg font-medium">Summary</h2>
@@ -32,8 +34,9 @@ export default function CardSummary({ summarys, disabled, setDisabled }: Props) 
               total={total}
               bgColor={bgColor}
               titleColor={titleColor}
-              disabled={disabled}
+              disabled={disabled} 
               setDisabled={setDisabled}
+              getTimeServer={getTimeServer}
             />
           )
         )}

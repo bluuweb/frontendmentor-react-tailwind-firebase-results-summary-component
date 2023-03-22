@@ -1,12 +1,14 @@
-import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
+import { FirebaseApp, FirebaseError, FirebaseOptions, initializeApp } from "firebase/app";
 import {
   Auth,
   getAuth,
   onAuthStateChanged,
   signInAnonymously,
+  User,
+  UserCredential,
 } from "firebase/auth";
 
-import { doc, Firestore, getFirestore, setDoc, serverTimestamp, getDoc  } from "firebase/firestore";
+import { Firestore, getFirestore  } from "firebase/firestore";
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: import.meta.env.VITE_apiKey,
@@ -22,27 +24,18 @@ export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);
 
 export const checkAuthState = () =>
-  new Promise((resolve, reject) => {
+  new Promise<User | UserCredential>((resolve, reject) => {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (user) => {
         unsubscribe();
         if (user) {
-          const lastVoteRef = doc(db, "lastVotes", user.uid);
-          
-          const docSnap = await getDoc(lastVoteRef);
-        
-          if(!docSnap.exists()){
-            await setDoc(lastVoteRef, {
-              lastVoteServerTime: serverTimestamp(),
-            });
-          }
           resolve(user);
         } else {
           try {
             resolve(await loginAnonymously());
           } catch (error) {
-            reject(error);
+            reject(error as Error);
           }
         }
       },
@@ -50,13 +43,6 @@ export const checkAuthState = () =>
     );
   });
 
-const loginAnonymously = async (): Promise<unknown> => {
-  try {
-    const res = await signInAnonymously(auth);
-    // console.log(res);
-    return res;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
+const loginAnonymously = async (): Promise<UserCredential> => {
+  return await signInAnonymously(auth);
 };
