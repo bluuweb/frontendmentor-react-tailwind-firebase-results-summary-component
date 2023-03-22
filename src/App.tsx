@@ -21,7 +21,7 @@ export default function App() {
   useEffect(() => {
     checkAuthState()
       .then((user) => {
-        console.log(user);
+        // console.log(user);
         setUser(user);
         setLoading(false);
       })
